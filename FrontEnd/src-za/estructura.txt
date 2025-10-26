@@ -1,0 +1,40 @@
+src/
+│
+├── api/
+│   └── api.js                  ← instancia única de Axios para todo el backend
+│
+├── layouts/
+│   └── AdminLayout.jsx         ← sidebar + header + slot para páginas admin
+│
+├── pages/
+│   └── admin/
+│       ├── Dashboard.jsx       ← home del admin, accesos directos
+│       ├── productos/
+│       │   ├── ListaProductos.jsx ← tabla con paginación
+│       │   └── FormularioProducto.jsx ← crear/editar productos
+│       ├── categorias/
+│       │   ├── ListaCategorias.jsx
+│       │   └── Formulariocategoria.jsx
+│       └── usuarios/
+│           ├── ListaUsuarios.jsx
+│           └── FormularioUsuario.jsx
+│
+├── components/
+│   ├── Tabla.jsx               ← tabla genérica reutilizable
+│   ├── Paginacion.jsx          ← componente de paginación
+│   ├── Loader.jsx              ← spinner mientras carga
+│   └── ConfirmDialog.jsx       ← modal de confirmación para borrar
+│
+├── hooks/
+│   ├── useProductos.js          ← lógica de CRUD de productos
+│   ├── useCategorias.js        ← lógica de CRUD de categorías
+│   └── useUsuarios.js             ← lógica de CRUD de usuarios
+│
+├── context/
+│   └── NotificationContext.jsx ← para mostrar toasts globales (éxito/error)
+│
+├── utils/
+│   └── validators.js           ← validaciones de formularios (opcional)
+│
+├── App.jsx                     ← rutas principales
+└── index.jsx                   ← punto de entrada React
