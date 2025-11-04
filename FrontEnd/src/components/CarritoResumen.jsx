@@ -8,12 +8,19 @@ import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 
 const CarritoResumen = () => {
-  const { carrito, vaciarCarrito, aumentarCantidad, disminuirCantidad, eliminarProducto, total, crearPedido } = useCarrito();
-  
+  const {
+    carrito,
+    vaciarCarrito,
+    aumentarCantidad,
+    disminuirCantidad,
+    eliminarProducto,
+    total,
+    crearPedido,
+  } = useCarrito();
+
   const { enqueueSnackbar } = useSnackbar();
 
   const navigate = useNavigate();
-
 
   if (!carrito?.length) {
     return (
@@ -51,7 +58,9 @@ const CarritoResumen = () => {
   const handleEliminar = async (idProducto) => {
     try {
       await eliminarProducto(idProducto);
-      enqueueSnackbar("Producto eliminado del carrito 🗑️", { variant: "warning" });
+      enqueueSnackbar("Producto eliminado del carrito 🗑️", {
+        variant: "warning",
+      });
     } catch (error) {
       console.error("Error al eliminar producto:", error);
       enqueueSnackbar("Error al eliminar el producto", { variant: "error" });
@@ -59,18 +68,20 @@ const CarritoResumen = () => {
   };
 
   const handleComprar = async () => {
-  if (!carrito.length) return;
+    if (!carrito.length) return;
 
-  try {
-    const pedido = await crearPedido();
-    enqueueSnackbar(`Pedido #${pedido.id} creado correctamente ✅`, { variant: "success" });
+    try {
+      const pedido = await crearPedido();
+      enqueueSnackbar(`Pedido #${pedido.id} creado correctamente ✅`, {
+        variant: "success",
+      });
 
-    // Redirigir al checkout
-    navigate(`/checkout/${pedido.id}`);
-  } catch (error) {
-    enqueueSnackbar("Error al procesar el pedido ❌", { variant: "error" });
-  }
-};
+      // Redirigir al checkout
+      navigate(`/checkout/${pedido.id}`);
+    } catch (error) {
+      enqueueSnackbar("Error al procesar el pedido ❌", { variant: "error" });
+    }
+  };
 
   return (
     <Box
@@ -133,8 +144,20 @@ const CarritoResumen = () => {
                 ${item.precio?.toFixed(2)} c/u
               </Typography>
 
-              <Box sx={{ display: "flex", alignItems: "center", mt: 0.5, gap: 0.5 }}>
-                <IconButton size="small" onClick={() => handleDisminuir(item.id)} color="secondary" sx={{ p: 0.5 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  mt: 0.5,
+                  gap: 0.5,
+                }}
+              >
+                <IconButton
+                  size="small"
+                  onClick={() => handleDisminuir(item.id)}
+                  color="secondary"
+                  sx={{ p: 0.5 }}
+                >
                   <RemoveIcon fontSize="inherit" />
                 </IconButton>
 
@@ -150,17 +173,33 @@ const CarritoResumen = () => {
                   {cantidad}
                 </Typography>
 
-                <IconButton size="small" onClick={() => handleAumentar(item.id)} color="secondary" sx={{ p: 0.5 }}>
+                <IconButton
+                  size="small"
+                  onClick={() => handleAumentar(item.id)}
+                  color="secondary"
+                  sx={{ p: 0.5 }}
+                >
                   <AddIcon fontSize="inherit" />
                 </IconButton>
 
-                <IconButton size="small" color="error" onClick={() => handleEliminar(item.id)} sx={{ ml: 1, p: 0.5 }}>
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() => handleEliminar(item.id)}
+                  sx={{ ml: 1, p: 0.5 }}
+                >
                   <DeleteIcon fontSize="inherit" />
                 </IconButton>
               </Box>
             </Box>
 
-            <Typography sx={{ fontWeight: "bold", color: "primary.main", justifySelf: "end" }}>
+            <Typography
+              sx={{
+                fontWeight: "bold",
+                color: "primary.main",
+                justifySelf: "end",
+              }}
+            >
               ${subtotal.toFixed(2)}
             </Typography>
           </Box>
@@ -169,18 +208,71 @@ const CarritoResumen = () => {
 
       <Divider sx={{ my: 3, borderColor: "secondary.main" }} />
 
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-        <Typography variant="h6" sx={{ color: "text.primary" }}>Total a Pagar:</Typography>
-        <Typography variant="h5" sx={{ fontWeight: "bold", color: "secondary.main" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <Typography variant="h6" sx={{ color: "text.primary" }}>
+          Total a Pagar:
+        </Typography>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: "bold", color: "secondary.main" }}
+        >
           ${total.toFixed(2)}
         </Typography>
       </Box>
 
-      <Button onClick={handleComprar} variant="contained" color="primary" sx={{ mt: 1, width: "100%", py: 1.5, fontSize: "1rem" }}>
+      <Button
+        onClick={handleComprar}
+        variant="contained"
+        color="primary"
+        sx={{ mt: 1, width: "100%", py: 1.5, fontSize: "1rem" }}
+      >
         Finalizar Compra
       </Button>
 
-      <Button onClick={vaciarCarrito} variant="text" color="secondary" sx={{ mt: 1, width: "100%", color: "text.secondary", "&:hover": { backgroundColor: "transparent", textDecoration: "underline" } }}>
+      <Button
+        onClick={() => {
+          navigate("/productos");
+          window.scrollTo({ top: 0, behavior: "smooth" }); // 👈 esto forza el scroll arriba
+        }}
+        variant="outlined"
+        color="secondary"
+        sx={{
+          mt: 1,
+          width: "100%",
+          py: 1.2,
+          fontSize: "1rem",
+          borderColor: "secondary.main",
+          color: "secondary.main",
+          "&:hover": {
+            backgroundColor: "secondary.main",
+            color: "white",
+          },
+        }}
+      >
+        Seguir Comprando
+      </Button>
+
+      <Button
+        onClick={vaciarCarrito}
+        variant="text"
+        color="secondary"
+        sx={{
+          mt: 1,
+          width: "100%",
+          color: "text.secondary",
+          "&:hover": {
+            backgroundColor: "transparent",
+            textDecoration: "underline",
+          },
+        }}
+      >
         Vaciar carrito
       </Button>
     </Box>
@@ -188,8 +280,6 @@ const CarritoResumen = () => {
 };
 
 export default CarritoResumen;
-
-
 
 {
   /*import { Box, Typography, Button, Divider, IconButton } from "@mui/material";

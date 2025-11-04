@@ -25,7 +25,7 @@ const GlobalSnackbarProvider = ({ children }) => {
         vertical: "top",
         horizontal: "right",
       }}
-      
+      autoHideDuration={1000}
       SnackbarProps={{
         ContentProps: {
           sx: {

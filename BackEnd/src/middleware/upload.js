@@ -1,6 +1,6 @@
 // src/middleware/upload.js
 
-// 🚨 1. Cambiar require() por import (Sintaxis ESM)
+//  1. Cambiar require() por import (Sintaxis ESM)
 import multer from 'multer';
 import path from 'path'; // path es un módulo nativo, se importa igual
 
@@ -49,6 +49,6 @@ const upload = multer({
   }
 });
 
-// 🚨 4. Cambiar module.exports por export default (Sintaxis ESM)
+//  4. Cambiar module.exports por export default (Sintaxis ESM)
 // Exportamos el método `single` para subir una sola imagen en el campo 'image'
 export default upload.single('image');

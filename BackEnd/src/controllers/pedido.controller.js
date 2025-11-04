@@ -44,30 +44,46 @@ export const getPedidos = async (req, res) => {
   }
 };
 
-// Obtener un pedido por ID
+// Obtener un pedido por ID con sus productos
+
+
 export const getPedidoById = async (req, res) => {
   try {
     const { id } = req.params;
-    if (!id || isNaN(id))
+    if (!id || isNaN(id)) {
       return res.status(400).json({ success: false, message: "ID inválido" });
+    }
 
-    const pedido = await Pedido.findOne({ where: { id, activo: true } });
-    if (!pedido)
+    const pedido = await Pedido.findOne({
+      where: { id, activo: true },
+      include: [
+        {
+          model: Producto,
+          as: "productos",
+          through: {
+            attributes: ["cantidad"] // trae cantidad desde PedidoProducto
+          }
+        }
+      ]
+    });
+
+    if (!pedido) {
       return res
         .status(404)
         .json({ success: false, message: "Pedido no encontrado" });
+    }
 
     res.status(200).json({
       success: true,
       message: "Pedido encontrado",
-      data: pedido,
+      data: pedido
     });
   } catch (error) {
     console.error("Error al obtener pedido:", error);
     res.status(500).json({
       success: false,
       message: "Error al obtener pedido",
-      error: error.message,
+      error: error.message
     });
   }
 };
@@ -199,75 +215,62 @@ export const deletePedido = async (req, res) => {
 };
 
 export const crearPedidoDesdeCarrito = async (req, res) => {
+  const idUsuario = req.usuario.id;
+  const { metodo = "transferencia" } = req.body;
+
+  const carrito = await Carrito.findOne({
+    where: { idUsuario, activo: true },
+    include: [{ association: "productos", through: { attributes: ["cantidad", "subtotal"] } }],
+  });
+
+  if (!carrito || carrito.productos.length === 0)
+    return res.status(400).json({ success: false, message: "Carrito vacío" });
+
+  const pedido = await Pedido.create({ idUsuario, metodo, estado: "pendiente", activo: true });
+
+  const pedidoProductos = carrito.productos.map((p) => ({
+    idPedido: pedido.id,
+    idProducto: p.id,
+    cantidad: p.CarritoProducto.cantidad,
+    precio_unitario: p.precio,
+    subtotal: p.CarritoProducto.subtotal,
+  }));
+
+  await PedidoProducto.bulkCreate(pedidoProductos);
+
+  const pedidoCompleto = await Pedido.findByPk(pedido.id, {
+    include: [{ association: "productos", through: { attributes: ["cantidad", "subtotal"] } }],
+  });
+
+  res.status(201).json({ success: true, message: "Pedido creado (pendiente)", data: pedidoCompleto });
+};
+
+
+export const confirmarPedido = async (req, res) => {
   try {
-    const idUsuario = req.usuario.id; //  viene del middleware de autenticación
-    const { metodo = "transferencia" } = req.body; // método por defecto
+    const { idPedido } = req.params;
+    const { direccion, metodo } = req.body;
 
-    // Buscar carrito activo del usuario con productos
-    const carrito = await Carrito.findOne({
-      where: { idUsuario, activo: true },
-      include: [
-        {
-          association: "productos",
-          attributes: ["id", "nombre", "precio"],
-          through: { attributes: ["cantidad", "subtotal"] },
-        },
-      ],
-    });
+    const pedido = await Pedido.findByPk(idPedido);
+    if (!pedido)
+      return res.status(404).json({ success: false, message: "Pedido no encontrado" });
 
-    if (!carrito || carrito.productos.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "El carrito está vacío o no existe",
-      });
+    // Actualizar pedido a confirmado
+    await pedido.update({ estado: "confirmado", metodo, direccion });
+
+    // Vaciar y desactivar carrito
+    const carrito = await Carrito.findOne({ where: { idUsuario: pedido.idUsuario, activo: true } });
+    if (carrito) {
+      await CarritoProducto.destroy({ where: { idCarrito: carrito.id } });
+      await carrito.update({ activo: false });
     }
 
-    //  Crear el pedido
-    const pedido = await Pedido.create({
-      idUsuario,
-      metodo,
-      estado: "pendiente",
-      activo: true,
-    });
-
-    // Crear los productos asociados al pedido
-    const pedidoProductos = carrito.productos.map((p) => ({
-      idPedido: pedido.id,
-      idProducto: p.id,
-      cantidad: p.CarritoProducto.cantidad,
-      precio_unitario: p.precio,
-      subtotal: p.CarritoProducto.subtotal,
-    }));
-
-    await PedidoProducto.bulkCreate(pedidoProductos);
-
-    // Vaciar el carrito
-    await CarritoProducto.destroy({ where: { idCarrito: carrito.id } });
-
-    // Marcar el carrito como inactivo
-    await carrito.update({ activo: false });
-
-    // Devolver el pedido con productos
-    const pedidoCompleto = await Pedido.findByPk(pedido.id, {
-      include: [
-        {
-          association: "productos",
-          attributes: ["id", "nombre", "precio"],
-          through: { attributes: ["cantidad", "subtotal", "precio_unitario"] },
-        },
-      ],
-    });
-
-    res.status(201).json({
-      success: true,
-      message: "Pedido creado correctamente desde el carrito",
-      data: pedidoCompleto,
-    });
+    res.status(200).json({ success: true, message: "Pedido confirmado y carrito inactivado" });
   } catch (error) {
-    console.error("Error al crear pedido desde carrito:", error);
+    console.error("Error al confirmar pedido:", error);
     res.status(500).json({
       success: false,
-      message: "Error al crear pedido desde carrito",
+      message: "Error al confirmar pedido",
       error: error.message,
     });
   }

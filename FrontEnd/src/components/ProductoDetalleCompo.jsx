@@ -7,10 +7,11 @@ import {
   CardMedia,
   CardContent,
   CircularProgress,
+  Chip,
   useTheme,
   IconButton,
 } from "@mui/material";
-import { Add, Remove } from "@mui/icons-material";
+import { Add, Remove, ArrowBack } from "@mui/icons-material";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../api";
 import { getImageUrl } from "../utils/imageUtils";
@@ -71,10 +72,13 @@ export default function ProductoDetalleCompo() {
 
   const handleComprar = () => {
     if (!isAuthenticated) {
-      enqueueSnackbar("Debes iniciar sesión o registrarte para comprar productos.", {
-        variant: "warning",
-        autoHideDuration: 4000,
-      });
+      enqueueSnackbar(
+        "Debes iniciar sesión o registrarte para comprar productos.",
+        {
+          variant: "warning",
+          autoHideDuration: 4000,
+        }
+      );
       navigate("/login");
       return;
     }
@@ -100,16 +104,33 @@ export default function ProductoDetalleCompo() {
           overflow: "hidden",
         }}
       >
-        <CardMedia
-          component="img"
-          sx={{
-            width: { xs: "100%", sm: 350 },
-            height: { xs: 220, sm: "auto" },
-            objectFit: "cover",
-          }}
-          image={producto.imagen}
-          alt={producto.nombre}
-        />
+        <Box position="relative">
+          {producto.etiqueta && (
+            <Chip
+              label={producto.etiqueta}
+              color="secondary"
+              sx={{ position: "absolute", top: 8, left: 8, zIndex: 1 }}
+            />
+          )}
+          {producto.oferta && (
+            <Chip
+              label={`${producto.descuento}% off`}
+              color="warning"
+              sx={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}
+            />
+          )}
+
+          <CardMedia
+            component="img"
+            sx={{
+              width: { xs: "100%", sm: 350 },
+              height: { xs: 220, sm: "auto" },
+              objectFit: "cover",
+            }}
+            image={producto.imagen}
+            alt={producto.nombre}
+          />
+        </Box>
 
         <CardContent sx={{ flex: 1, p: 3 }}>
           <Typography variant="h4" fontWeight="bold" gutterBottom>
@@ -178,9 +199,6 @@ export default function ProductoDetalleCompo() {
     </Box>
   );
 }
-
-
-
 
 {
   /*import React, { useState, useEffect } from "react";

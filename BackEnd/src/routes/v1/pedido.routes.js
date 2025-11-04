@@ -7,6 +7,7 @@ import {
   updatePedido,
   deletePedido,
   crearPedidoDesdeCarrito,
+   confirmarPedido,
 } from "../../controllers/pedido.controller.js";
 import { protect } from "../../middleware/auth.middleware.js";
 import { adminOnly } from "../../middleware/roles.middleware.js";
@@ -22,5 +23,7 @@ router.delete("/:id", protect, adminOnly, deletePedido);
 
 //  Crear pedido desde carrito (usuario autenticado)
 router.post("/desde-carrito", protect, crearPedidoDesdeCarrito);
+// Confirmar pedido (usuario autenticado)
+router.put("/confirmar/:idPedido", protect, confirmarPedido);
 
 export default router;

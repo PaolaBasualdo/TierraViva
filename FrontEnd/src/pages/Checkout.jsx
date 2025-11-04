@@ -40,17 +40,25 @@ export default function Checkout() {
     fetchPedido();
   }, [idPedido, enqueueSnackbar]);
 
+  // ✅ Confirmar pedido y vaciar carrito
   const handleConfirmar = async () => {
     try {
-      await API.put(`/pedidos/${idPedido}`, {
+      // 1️⃣ Confirmar pedido
+      await API.put(`/pedidos/confirmar/${idPedido}`, {
         direccion,
         metodo: metodoPago,
-        estado: "confirmado",
       });
+
+      // 2️⃣ Vaciar carrito y marcarlo como inactivo
+      await API.post("/carritos/vaciar");
+      await API.put("/carritos/activar", { activo: false });
+
+      // 3️⃣ Notificación y redirección
       enqueueSnackbar("Pedido confirmado ✅", { variant: "success" });
-      navigate(`/pedido/${idPedido}`); // o "/perfil/pedidos"
+      navigate(`/pedido/${idPedido}`);
     } catch (error) {
       enqueueSnackbar("Error al confirmar el pedido ❌", { variant: "error" });
+      console.error(error);
     }
   };
 
@@ -124,13 +132,11 @@ export default function Checkout() {
           />
         </RadioGroup>
 
-        {/* Resumen */}
+        {/* Resumen del pedido */}
         <Divider sx={{ mb: 3 }} />
         <Typography variant="subtitle1" sx={{ mb: 1 }}>
           Resumen del pedido:
         </Typography>
-{console.log("pedido:", pedido)}
-{console.log("productos:", pedido?.productos)}
 
         {pedido.productos?.map((p) => (
           <Box

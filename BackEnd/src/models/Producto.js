@@ -9,7 +9,11 @@ const Producto = sequelize.define(
     descripcion: { type: DataTypes.TEXT, allowNull: true },
     precio: { type: DataTypes.FLOAT, allowNull: false },
     stock: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
-    imagen: { type: DataTypes.STRING, allowNull: true },
+    imagen: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    
     estado: {
       type: DataTypes.ENUM("pendiente", "aprobado", "rechazado"),
       allowNull: false,
@@ -26,7 +30,6 @@ const Producto = sequelize.define(
     idUsuario: { type: DataTypes.INTEGER, allowNull: false },
     idCategoria: { type: DataTypes.INTEGER, allowNull: true },
     activo: { type: DataTypes.BOOLEAN, defaultValue: true },
-
   },
   {
     tableName: "productos",

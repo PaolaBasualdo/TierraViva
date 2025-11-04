@@ -45,6 +45,9 @@ const ProductList = ({
         setProductos(processed);
         setPagination(data.pagination);
         setPage(newPage);
+
+window.scrollTo({ top: 0, behavior: "smooth" });
+
       } else {
         setProductos([]);
       }

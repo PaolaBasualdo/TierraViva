@@ -29,6 +29,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import VerMas from "./pages/VerMas";
 
+
 // Páginas admin
 import Dashboard from "./pages/admin/Dashboard";
 import ListaProductos from "./pages/admin/productos/ListaProductos";
@@ -63,6 +64,9 @@ function App() {
                 <Route path="/contacto" element={<Contacto />} />
                 <Route path="/categorias" element={<Categorias />} />
                 <Route path="/categoria/:id" element={<CategoriaDetalle />} />
+
+
+
                 <Route
                   path="/productos/categoria/:id"
                   element={<ProductosxCategoria />}

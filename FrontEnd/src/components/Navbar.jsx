@@ -19,6 +19,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useCarrito } from "../contexts/CarritoContext";
+import { useSnackbar } from "notistack";  
 
 const pages = [
   { name: "Inicio", path: "/" },
@@ -34,6 +35,7 @@ function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
 
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   
   const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
   const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
@@ -46,6 +48,16 @@ function Navbar() {
   };
 
   const { carrito } = useCarrito();
+
+  const handleCarritoClick = (event) => {
+    if (!user) {
+      event.preventDefault(); // evita que navegue al carrito
+      enqueueSnackbar("Debes iniciar sesión o registrarte para comprar productos 🛒", {
+        variant: "warning",
+      });
+    }
+  };
+
 
   return (
     <AppBar position="static" sx={{ bgcolor: "secondary.main" }}>
@@ -141,6 +153,7 @@ function Navbar() {
               color="inherit"
               component={Link}
               to="/carrito"
+              onClick={handleCarritoClick} 
             >
               <Badge badgeContent={carrito.length} color="error">
                 <ShoppingCartIcon />

@@ -4,8 +4,8 @@ import {
   getCarritos,
   getCarritoById,
   createCarrito,
-  updateCarrito,
-  deleteCarrito,
+ 
+  
   getCarritoActivo,
   agregarProducto,
   vaciarCarrito,
@@ -22,8 +22,8 @@ router.use(protect);
 router.get("/", getCarritos);
 router.get("/activo", getCarritoActivo);
 router.post("/", createCarrito);
-router.put("/:id", updateCarrito);
-router.delete("/:id", deleteCarrito);
+
+
 
 // Acciones sobre el carrito activo
 router.post("/agregar", agregarProducto);
